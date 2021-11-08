@@ -21,7 +21,7 @@ def generateBitmap(file):
     pixels = list(img.getdata())
 
     threshold = 10
-
+    print(pixels)
     """
         Convertir los valores de la lista <pixels> en 0's o 1's
     """
@@ -34,6 +34,8 @@ def generateBitmap(file):
         else:
             newPixel = (1)
         newPixels.append(newPixel)
+
+    print(newPixels)
 
     """"
         Crear de la lista <newPixels> un string de 0's y 1's

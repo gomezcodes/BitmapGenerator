@@ -1,6 +1,8 @@
 import os
+from convertidordeimagen import generateBitmap
 
-ejemplo_dir = '/home/sistron/Documentos/Programacion/TrafficLights/GraphicUserInterface/'
+"""___________________________________________________________________________________________"""
+ejemplo_dir = os.getcwd()
 
 contenido = os.listdir(ejemplo_dir)
 
@@ -11,6 +13,10 @@ for fichero in contenido:
         imagenes.append(fichero)
 
 print(imagenes)
+"""___________________________________________________________________________________________"""
+
+"""___________________________________________________________________________________________"""
+
 
 commands = {
     "DEMOON" : b'\x5A\x08\x04\x84\x00\x00\x01',
@@ -28,14 +34,14 @@ commands = {
 
 a="BRIGHTH"
 
-
-
-
 if a in commands:
     print("yes")
 else:
     print("no")
 
+"""___________________________________________________________________________________________"""
+
+"""___________________________________________________________________________________________"""
 
 def queseyo():
     lista=[]
@@ -46,10 +52,34 @@ parte1,parte2 = queseyo()
 print(parte1)
 print(parte2)
 
+"""___________________________________________________________________________________________"""
+
+"""___________________________________________________________________________________________"""
+
 listaA=[0x50,0x51,0x52]
 
 listaB=listaA
 listaB.append(0x00);listaB.append(0x01)
 
 print(listaB)
+
+"""___________________________________________________________________________________________"""
+
+"""___________________________________________________________________________________________"""
+
+brightValue = 100
+brightValue = int((brightValue*2000)/100.0)
+tobytes = brightValue.to_bytes(2, byteorder='big')
+BRIGHt = list(b'\x5A\x08\x05\x80\x00\x08')
+
+BRIGHt.append(tobytes[0])
+BRIGHt.append(tobytes[1])
+
+if 90 in BRIGHt:
+    print(BRIGHt)
+print(len(BRIGHt))
+
+
+"""___________________________________________________________________________________________"""
+a,b = generateBitmap('d:\VSCode\Folders\TrafficLights\GUI\BitmapGenerator\circulo.png')
 

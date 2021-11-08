@@ -2,10 +2,23 @@ import serial
 import time
 from convertidordeimagen import generateBitmap
 from termcolor import colored,cprint
-import serial.tools.list_ports_linux
+import serial.tools.list_ports_windows
 import os
+import platform
 
+SYSTEMOS = platform.system()
+if SYSTEMOS == "Windows":
+	import serial.tools.list_ports
+elif SYSTEMOS == "Linux":
+	import serial.tools.list_ports_linux
+else:
+	import serial.tools.list_ports
 
+print("Working on #" + SYSTEMOS)
+
+BASECOMMAND = 0
+ATTRIBUTE1 = 1
+ATTRIBUTE2 = 2
 BYTES = 64
 
 uartCommands = {
@@ -14,18 +27,22 @@ uartCommands = {
 	"SAVE" 		: b'\x5A\x08\x04\x84\x00\x01\x01',
 	"BLINKOFF" 	: b'\x5A\x08\x05\x80\x00\x01\x00\x00',
 	"BLINKON" 	: b'\x5A\x08\x05\x80\x00\x01\x00\x01',
+	"BLINKTIME" : b'\x5A\x08\x05\x80\x00\x07',
 	"BITMAP1" 	: b'\x5A\x08\x05\x80\x00\x00\x00\x00',
 	"BITMAP2" 	: b'\x5A\x08\x05\x80\x00\x00\x00\x01',
 	"BITMAP3" 	: b'\x5A\x08\x05\x80\x00\x00\x00\x02',
 	"BITMAP4" 	: b'\x5A\x08\x05\x80\x00\x00\x00\x03',
-	"BRIGHTH" 	: b'\x5A\x08\x05\x80\x00\x08\x07\xD0',
-	"BRIGHTL" 	: b'\x5A\x08\x05\x80\x00\x08\x00\x03',
-	"COLOR"	  	: [0x5A,0X08,0X05,0X80,0x00],
+	"BRIGHT" 	: b'\x5A\x08\x05\x80\x00\x08',
+	"COLOR"	  	: b'\x5A\x08\x05\x80\x00',
 	"LOAD"	  	: None,
 }
 
 def scanUARTPorts():
-	ports = serial.tools.list_ports_linux.comports()
+	if SYSTEMOS == "Windows":
+		ports = serial.tools.list_ports.comports()
+	else:
+		ports = serial.tools.list_ports_linux.comports()
+
 	cprint("Available ports","red")
 	for port in ports:
 		string = str(ports.index(port))+ ". " + port.device + " " + port.description
@@ -55,10 +72,10 @@ def switchMenuCommand(receivedCommand):
 	[COLOR <BITMAP> <COLOR>]....Changes <COLOR> of <BITMAP>
 	[BLINKON]...................Blink Display
 	[BLINKOFF]..................Stop blink 
+	[BLINKTIME <VALUE>].........Set blink time (seconds)
 	[LOAD]......................Write to bitmap
 	[SAVE]......................Save data to EEPROM
-	[BRIGHT+]...................Higher brightness
-	[BRIGHT-]...................Lower brightness
+	[BRIGHT <VALUE>]............Set brightness (percentage)
 	
 	[EXIT] 
 			''','green',attrs=['dark'])
@@ -70,7 +87,11 @@ def processUARTCommand(command):
 	if command == "LOAD":
 		processLoadCommand()
 	elif command == "COLOR":
-		changeColor(commandSelected[1],commandSelected[2])
+		processChangeColorCommand(commandSelected[ATTRIBUTE1],commandSelected[ATTRIBUTE2])
+	elif command == "BRIGHT":
+		processBrightCommand(int(commandSelected[ATTRIBUTE1]))
+	elif command == "BLINKTIME":
+		processBlinkCommand(int(commandSelected[ATTRIBUTE1]))
 	else:
 		device.write(uartCommands.get(command))
 	print("<Command: " + command + " sent correctly!>")
@@ -119,11 +140,11 @@ def selectImage():
 
 	return imagePath
 
-def changeColor(bitmap,Color):
+def processChangeColorCommand(bitmap,Color):
 
-	basicColorCommand = uartCommands.get("COLOR")
-	basicColorCommand.append(int(bitmap[-1:])+2)
-	basicColorCommand.append(0x00)
+	preColorCommand = list(uartCommands.get("COLOR"))
+	preColorCommand.append(int(bitmap[-1:])+2)
+	preColorCommand.append(0x00)
 	color = {
 		"RED":"0",
 		"GREEN":"1",
@@ -134,9 +155,31 @@ def changeColor(bitmap,Color):
 		"WHITE":"6",
 		"BLACK":"7",
 	}
-	basicColorCommand.append(int(color.get(Color)))
-	colorCommand = bytearray(basicColorCommand)
+	preColorCommand.append(int(color.get(Color)))
+	colorCommand = bytearray(preColorCommand)
 	device.write(colorCommand)
+
+def processBrightCommand(brightValue):
+	brightValue = int((brightValue*2000)/100.0)
+	brightValueToBytes = brightValue.to_bytes(2, byteorder='big')
+
+	preBrightCommand = list(uartCommands.get("BRIGHT"))
+	preBrightCommand.append(brightValueToBytes[0]);preBrightCommand.append(brightValueToBytes[1])
+	brightCommand = bytearray(preBrightCommand)
+
+	device.write(brightCommand)
+
+def processBlinkCommand(blinkValue):
+	blinkValueToBytes = blinkValue.to_bytes(2, byteorder='big')
+
+	preBlinkCommand = list(uartCommands.get("BLINKTIME"))
+	preBlinkCommand.append(blinkValueToBytes[0]);preBlinkCommand.append(blinkValueToBytes[1])
+	blinkCommand = bytearray(preBlinkCommand)
+
+	print(blinkCommand)
+
+	device.write(blinkCommand)
+
 
 cprint('''
 		__________________________________________
@@ -161,9 +204,9 @@ while True:
 	commandSelected = input(">").upper()
 	commandSelected = commandSelected.split(' ')
 	
-	if commandSelected[0] == "EXIT":
+	if commandSelected[BASECOMMAND] == "EXIT":
 		break	
-	switchMenuCommand(commandSelected[0])
+	switchMenuCommand(commandSelected[BASECOMMAND])
 
 
 device.close()
