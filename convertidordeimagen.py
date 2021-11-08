@@ -94,7 +94,7 @@ def generateBitmap(file):
     for i in range(128):
         hexListOfBytes.append(int(orderListOfBytes[i],2))
 
-    return hexListOfBytes
+    return hexListOfBytes[0:64], hexListOfBytes[64:128]
     
 
 
