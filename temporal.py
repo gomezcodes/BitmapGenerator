@@ -32,13 +32,16 @@ commands = {
     "BRIGHTL" : b'\x5A\x08\x05\x80\x00\x08\x00\x03',
 }
 
-a="BRIGHTH"
+a= b'\x5A\x08\x05\x80\x00\x01\x00\x00'
+a=None
 
-if a in commands:
+if a in list(commands.values()):
     print("yes")
 else:
     print("no")
+print(len(commands.get("BLINKOFF")))
 
+ 
 """___________________________________________________________________________________________"""
 
 """___________________________________________________________________________________________"""
@@ -79,7 +82,52 @@ if 90 in BRIGHt:
     print(BRIGHt)
 print(len(BRIGHt))
 
+"""___________________________________________________________________________________________"""
 
 """___________________________________________________________________________________________"""
-a,b = generateBitmap('d:\VSCode\Folders\TrafficLights\GUI\BitmapGenerator\circulo.png')
+#a,b = generateBitmap('d:\VSCode\Folders\TrafficLights\GUI\BitmapGenerator\circulo.png')
 
+a= [0,1]
+b= [(0,1),(2,3)]
+
+if type(a[0]) == int:
+    print(a)
+
+if type(b[0]) == tuple:
+    print(b)
+
+"""___________________________________________________________________________________________"""
+
+"""___________________________________________________________________________________________"""
+
+
+"""hexadecimalI = int(input("numero:"),16)
+hexadecimalII = hexadecimalI
+hexadecimalII += 64
+
+addressValueToBytes = hexadecimalI.to_bytes(2, byteorder='big')
+print(addressValueToBytes[1],addressValueToBytes[0])
+print(hexadecimalI,hexadecimalII,type(hexadecimalI))
+"""
+print(type(None))
+
+"""___________________________________________________________________________________________"""
+
+"""___________________________________________________________________________________________"""
+
+bitmap = "BITMAP1"
+x = (int(bitmap[-1:])+2)
+
+print(x)
+
+btmaddr = 1024
+bitmapAddress = [0X0000,0X0400,0X0180,0X0580,0X0200,0X0600,0X0380,0X0780]
+
+if btmaddr in bitmapAddress:
+    print("it is    !!")
+else:
+    print("it's not  :c!")
+
+"""___________________________________________________________________________________________"""
+
+"""___________________________________________________________________________________________"""

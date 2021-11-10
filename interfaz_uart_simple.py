@@ -2,24 +2,24 @@ import serial
 import time
 from convertidordeimagen import generateBitmap
 from termcolor import colored,cprint
-import serial.tools.list_ports_windows
 import os
 import platform
 
 SYSTEMOS = platform.system()
 if SYSTEMOS == "Windows":
-	import serial.tools.list_ports
+	import serial.tools.list_ports_windows
 elif SYSTEMOS == "Linux":
 	import serial.tools.list_ports_linux
 else:
-	import serial.tools.list_ports
-
+	print(SYSTEMOS)
 print("Working on #" + SYSTEMOS)
 
 BASECOMMAND = 0
 ATTRIBUTE1 = 1
 ATTRIBUTE2 = 2
 BYTES = 64
+
+bitmapAddress = [0X0000,0X0400,0X0180,0X0580,0X0200,0X0600,0X0380,0X0780]
 
 uartCommands = {
 	"DEMOON" 	: b'\x5A\x08\x04\x84\x00\x00\x01',
@@ -34,23 +34,39 @@ uartCommands = {
 	"BITMAP4" 	: b'\x5A\x08\x05\x80\x00\x00\x00\x03',
 	"BRIGHT" 	: b'\x5A\x08\x05\x80\x00\x08',
 	"COLOR"	  	: b'\x5A\x08\x05\x80\x00',
-	"LOAD"	  	: None,
+	"LOAD"	  	: b'\x5A\x08\x43\x82',
 }
 
+
 def scanUARTPorts():
-	if SYSTEMOS == "Windows":
-		ports = serial.tools.list_ports.comports()
-	else:
-		ports = serial.tools.list_ports_linux.comports()
 
-	cprint("Available ports","red")
-	for port in ports:
-		string = str(ports.index(port))+ ". " + port.device + " " + port.description
-		cprint(string,'green')           
+	while True:
 
-	devicePort = int(input("Select usb device (index)\n>"))
-	portIDSelected= ports[devicePort].device 
-	portSelectedDescription = ports[devicePort].description
+		if SYSTEMOS == "Windows":
+			ports = serial.tools.list_ports.comports()
+		else:
+			ports = serial.tools.list_ports_linux.comports()
+
+		if len(ports) == 0:
+			cprint("No ports available!","red")
+			portIDSelected,portSelectedDescription = None, None
+			retryOption = input("Rescan y/n \n>")
+
+			if retryOption == ("n" or "N"):
+				break
+
+		else:
+			cprint("Available ports","green")
+			for port in ports:
+				string = str(ports.index(port))+ ". " + port.device + " " + port.description
+				cprint(string,'green')        
+			devicePort = int(input("Select usb device (index)\n>"))
+			try:	
+				portIDSelected= ports[devicePort].device 
+				portSelectedDescription = ports[devicePort].description
+				break
+			except IndexError:
+				cprint("Error! port selected is not available!","red",attrs=["bold"])
 
 	return portIDSelected,portSelectedDescription
 
@@ -69,57 +85,119 @@ def switchMenuCommand(receivedCommand):
 	[BITMAP2]...................Display bitmap2
 	[BITMAP3]...................Display bitmap3
 	[BITMAP4]...................Display bitmap4
-	[COLOR <BITMAP> <COLOR>]....Changes <COLOR> of <BITMAP>
 	[BLINKON]...................Blink Display
 	[BLINKOFF]..................Stop blink 
-	[BLINKTIME <VALUE>].........Set blink time (seconds)
-	[LOAD]......................Write to bitmap
-	[SAVE]......................Save data to EEPROM
+	[BLINKTIME <VALUE>].........Set blink time (miliseconds)
 	[BRIGHT <VALUE>]............Set brightness (percentage)
+	[COLOR <BITMAP> <COLOR>]....Changes <COLOR> of <BITMAP>
+		
+		<BITMAP>	<COLOR>
+		BITMAP1		RED
+		BITMAP2 	GREEN
+		BITMAP3		YELLOW
+		BITMAP4		BLUE
+			    	CYAN
+			    	PINK
+			    	WHITE
+
+	[LOAD <ADDRESS>]............Write to bitmap
+
+		<ADRESS>
+			0X0000	0X0400
+			0X0180	0X0580
+			0X0200	0X0600
+			0X0380	0X0780
+
+	[SAVE]......................Save data to EEPROM
 	
 	[EXIT] 
 			''','green',attrs=['dark'])
 	else:
-		print("comando incorrecto!")
+		cprint("Wrong Command!","red",attrs=["bold"])
 
 def processUARTCommand(command):
 
-	if command == "LOAD":
-		processLoadCommand()
-	elif command == "COLOR":
-		processChangeColorCommand(commandSelected[ATTRIBUTE1],commandSelected[ATTRIBUTE2])
-	elif command == "BRIGHT":
-		processBrightCommand(int(commandSelected[ATTRIBUTE1]))
-	elif command == "BLINKTIME":
-		processBlinkCommand(int(commandSelected[ATTRIBUTE1]))
+	try:
+		if command == "LOAD":
+			commandSent = processLoadCommand(int(commandSelected[ATTRIBUTE1],16))
+		elif command == "COLOR":
+			commandSent = processChangeColorCommand(commandSelected[ATTRIBUTE1],commandSelected[ATTRIBUTE2])
+		elif command == "BRIGHT":
+			commandSent = processBrightCommand(int(commandSelected[ATTRIBUTE1]))
+		elif command == "BLINKTIME":
+			commandSent = processBlinkCommand(int(commandSelected[ATTRIBUTE1]))
+		else:
+			device.write(uartCommands.get(command))
+			commandSent = uartCommands.get(command)
+	except:
+		cprint("Syntax error, for more info type 'help'","red",attrs=["bold"])
+		commandSent = None
+
+	if commandSent != None:
+
+		#print("<Command: " + str(commandSent) + " sent correctly!>")
+		device.reset_input_buffer()
+
+		slaveAnswer = device.read(len(commandSent))
+
+		if slaveAnswer == commandSent:
+			print("Slave answered " + str(slaveAnswer) + "thus, all is working properly!")
+		else:
+			print("Slave answer do not match send command")
+			print(slaveAnswer)
+			print(commandSent)
+		#time.sleep(1)
+		#print(device.in_waiting)
+		#device.reset_input_buffer()
+		#print(device.in_waiting)
+
 	else:
-		device.write(uartCommands.get(command))
-	print("<Command: " + command + " sent correctly!>")
+		print("Error sending command, try again")
+
 
 	"""
 		TO DO: VERIFICAR LA RESPUESTA DEL ESCLAVO
 		validateSlaveAnswer()
 	"""
 
-def processLoadCommand():
 
-	selectedImagePath = selectImage()
-	
-	bitmapPart1,bitmapPart2 = generateBitmap(selectedImagePath)
-	
-	bitmapCommandPart1 = [0x5A,0X08,0X43,0X82,0X00,0X00]
-	bitmapCommandPart2 = [0x5A,0X08,0X43,0X82,0X00,0X40]
+def processLoadCommand(startAddress):
 
-	for i in range(BYTES):
-		bitmapCommandPart1.append(bitmapPart1[i])
-		bitmapCommandPart2.append(bitmapPart2[i])
+	if startAddress in bitmapAddress:
 
-	commandWriteBitmap1 = bytearray(bitmapCommandPart1)
-	commandWriteBitmap2 = bytearray(bitmapCommandPart2)
+		addressPart1 = startAddress
+		addressPart2 = addressPart1 + 64
+		addressValueToBytesPart1 = addressPart1.to_bytes(2, byteorder='big')
+		addressValueToBytesPart2 = addressPart2.to_bytes(2, byteorder='big')
+		preLoadCommandFirstPart = list(uartCommands.get("LOAD"))
+		preLoadCommandSecondPart = list(uartCommands.get("LOAD"))
 
-	device.write(commandWriteBitmap1)
-	time.sleep(1)
-	device.write(commandWriteBitmap2)
+		preLoadCommandFirstPart.append(addressValueToBytesPart1[0])
+		preLoadCommandFirstPart.append(addressValueToBytesPart1[1])
+		preLoadCommandSecondPart.append(addressValueToBytesPart2[0])
+		preLoadCommandSecondPart.append(addressValueToBytesPart2[1])
+
+
+		selectedImagePath = selectImage()
+		bitmapPart1,bitmapPart2 = generateBitmap(selectedImagePath)
+
+
+		for i in range(BYTES):
+			preLoadCommandFirstPart.append(bitmapPart1[i])
+			preLoadCommandSecondPart.append(bitmapPart2[i])
+
+		loadCommandFirstPart = bytearray(preLoadCommandFirstPart)
+		loadCommandSecondart = bytearray(preLoadCommandSecondPart)
+
+		device.write(loadCommandFirstPart)
+		time.sleep(1)
+		device.write(loadCommandSecondart)
+
+		return loadCommandFirstPart
+	else:
+		cprint("Bitmap address unavailable","red",attrs=["bold"])
+		return None
+
 
 def selectImage():
 	imagesPath = os.getcwd()
@@ -127,7 +205,7 @@ def selectImage():
 	imagenes = []
 
 	for fichero in imagesOnPath:
-		if (os.path.isfile(os.path.join(imagesPath, fichero))) and (fichero.endswith('.png')):
+		if (os.path.isfile(os.path.join(imagesPath, fichero))) and ((fichero.endswith('.png')) or (fichero.endswith('.jpeg'))):
 			imagenes.append(fichero)
 		
 	cprint("Available Images: ","green")		
@@ -142,22 +220,28 @@ def selectImage():
 
 def processChangeColorCommand(bitmap,Color):
 
-	preColorCommand = list(uartCommands.get("COLOR"))
-	preColorCommand.append(int(bitmap[-1:])+2)
-	preColorCommand.append(0x00)
-	color = {
-		"RED":"0",
-		"GREEN":"1",
-		"BLUE":"2",
-		"YELLOW":"3",
-		"PINK":"4",
-		"CYAN":"5",
-		"WHITE":"6",
-		"BLACK":"7",
-	}
-	preColorCommand.append(int(color.get(Color)))
-	colorCommand = bytearray(preColorCommand)
-	device.write(colorCommand)
+	try:
+		preColorCommand = list(uartCommands.get("COLOR"))
+		preColorCommand.append(int(bitmap[-1:])+2)
+		preColorCommand.append(0x00)
+		color = {
+			"RED":"0",
+			"GREEN":"1",
+			"BLUE":"2",
+			"YELLOW":"3",
+			"PINK":"4",
+			"CYAN":"5",
+			"WHITE":"6",
+			"BLACK":"7",
+		}
+	
+		preColorCommand.append(int(color.get(Color)))
+		colorCommand = bytearray(preColorCommand)
+		device.write(colorCommand)
+		return colorCommand
+	except:
+		cprint("Syntax error, for more info type 'help'","red",attrs=["bold"])
+		return None
 
 def processBrightCommand(brightValue):
 	brightValue = int((brightValue*2000)/100.0)
@@ -169,6 +253,8 @@ def processBrightCommand(brightValue):
 
 	device.write(brightCommand)
 
+	return brightCommand
+
 def processBlinkCommand(blinkValue):
 	blinkValueToBytes = blinkValue.to_bytes(2, byteorder='big')
 
@@ -179,6 +265,7 @@ def processBlinkCommand(blinkValue):
 	print(blinkCommand)
 
 	device.write(blinkCommand)
+	return blinkCommand
 
 
 cprint('''
@@ -191,7 +278,7 @@ cprint('''
  		''', 'magenta',attrs=['bold'])
 
 portID,portDescription = scanUARTPorts()
-
+	 
 try:
 	device = serial.Serial(portID,baudrate = 19200)
 	string = "Succesfully conected to: " + portDescription
