@@ -133,9 +133,9 @@ def processUARTCommand(command):
 		cprint("Syntax error, for more info type 'help'","red",attrs=["bold"])
 		commandSent = None
 
-	if commandSent != None:
-
-		#print("<Command: " + str(commandSent) + " sent correctly!>")
+	if commandSent == "Success":
+		pass
+	elif commandSent != None:
 		device.reset_input_buffer()
 
 		slaveAnswer = device.read(len(commandSent))
@@ -146,11 +146,6 @@ def processUARTCommand(command):
 			print("Slave answer do not match send command")
 			print(slaveAnswer)
 			print(commandSent)
-		#time.sleep(1)
-		#print(device.in_waiting)
-		#device.reset_input_buffer()
-		#print(device.in_waiting)
-
 	else:
 		print("Error sending command, try again")
 
@@ -187,13 +182,24 @@ def processLoadCommand(startAddress):
 			preLoadCommandSecondPart.append(bitmapPart2[i])
 
 		loadCommandFirstPart = bytearray(preLoadCommandFirstPart)
-		loadCommandSecondart = bytearray(preLoadCommandSecondPart)
+		loadCommandSecondPart = bytearray(preLoadCommandSecondPart)
+
+		device.reset_input_buffer()
 
 		device.write(loadCommandFirstPart)
-		time.sleep(1)
-		device.write(loadCommandSecondart)
+		slaveAnswerFirstPart = device.read(len(loadCommandFirstPart))
+		
+		device.write(loadCommandSecondPart)
+		slaveAnswerSecondPart = device.read(len(loadCommandFirstPart))
 
-		return loadCommandFirstPart
+		if (slaveAnswerFirstPart == loadCommandFirstPart) and (slaveAnswerSecondPart == loadCommandSecondPart):
+
+			print("Slave answered correctly,thus all is working properly!")
+			return "Success"
+		else:
+			print("Slave answer do not match send command")
+			return None
+
 	else:
 		cprint("Bitmap address unavailable","red",attrs=["bold"])
 		return None
@@ -288,13 +294,11 @@ except:
 
 while True:
 
-	commandSelected = input(">").upper()
+	commandSelected = input(">_").upper()
 	commandSelected = commandSelected.split(' ')
 	
 	if commandSelected[BASECOMMAND] == "EXIT":
 		break	
 	switchMenuCommand(commandSelected[BASECOMMAND])
 
-
 device.close()
-

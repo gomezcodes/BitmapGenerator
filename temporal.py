@@ -33,8 +33,10 @@ commands = {
 }
 
 a= b'\x5A\x08\x05\x80\x00\x01\x00\x00'
-a=None
+b= b'\xFF\xff'
+c = a + b
 
+print(c)
 if a in list(commands.values()):
     print("yes")
 else:
