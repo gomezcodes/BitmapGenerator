@@ -43,7 +43,7 @@ def scanUARTPorts():
 	while True:
 
 		if SYSTEMOS == "Windows":
-			ports = serial.tools.list_ports.comports()
+			ports = serial.tools.list_ports_windows.comports()
 		else:
 			ports = serial.tools.list_ports_linux.comports()
 
