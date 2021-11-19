@@ -1,8 +1,10 @@
 from tkinter import *
+import time
 
 w=Tk()
 w.geometry("300x500")
 w.configure(bg="#141414")
+
 
 def bttn(x,y,text,bcolor,fcolor):
 
@@ -24,7 +26,8 @@ def bttn(x,y,text,bcolor,fcolor):
 					  overrelief="flat",
 					  highlightthickness=0,
 					  activeforeground=fcolor,
-					  activebackground=bcolor,)
+					  activebackground=bcolor,
+					  )
 
 	mybutton.bind("<Enter>", on_enter)
 	mybutton.bind("<Leave>", on_leave)
@@ -35,8 +38,6 @@ bttn(0,0,"J O A Q U I N","#FFCC66","#141414")
 bttn(0,37,"P O S M O","#25DAE9","#141414")
 bttn(0,74,"G I S E L I T A","#F86263","#141414")
 bttn(0,110,"O L I V E R","#FFA157","#141414")
-
-
 
 
 w.mainloop()

@@ -3,6 +3,7 @@ from tkinter import *
 def button_hover(event):
 	my_button["activeback"]="Azure"
 	status_label.config(text="I'm hovering over the button ")
+	my_button.flash()
 
 def button_hover_leave(event):
 	my_button["bg"]="silver"
