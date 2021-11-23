@@ -1,9 +1,46 @@
 import os
-from convertidordeimagen import generateBitmap
-from tkinter import *
+#from modules.bitmapGenerator import generateBitmap
+#from tkinter import *
 
 """___________________________________________________________________________________________"""
-ejemplo_dir = os.getcwd()
+"""___________________________________________________________________________________________"""
+
+import platform
+import serial
+
+SYSTEMOS = platform.system()
+
+if SYSTEMOS == "Windows":
+	import serial.tools.list_ports_windows
+else:
+	import serial.tools.list_ports_linux
+
+def scanPorts():
+    """ portIDSelected = None
+    portSelectedDescription = None """
+    availablePorts = []
+
+    if SYSTEMOS == "Windows":
+        ports = serial.tools.list_ports_windows.comports()
+    else:
+	    ports = serial.tools.list_ports_linux.comports()
+
+    if len(ports) != 0:
+
+        for port in ports:
+            portAttributes= [port.device,port.description]
+            availablePorts.append(portAttributes)
+
+        return availablePorts
+
+    return None
+
+print(scanPorts())
+
+"""___________________________________________________________________________________________"""
+
+"""___________________________________________________________________________________________"""
+""" ejemplo_dir = os.getcwd()
 
 contenido = os.listdir(ejemplo_dir)
 
@@ -13,13 +50,13 @@ for fichero in contenido:
     if os.path.isfile(os.path.join(ejemplo_dir, fichero)) and fichero.endswith('.png'):
         imagenes.append(fichero)
 
-print(imagenes)
+print(imagenes) """
 """___________________________________________________________________________________________"""
 
 """___________________________________________________________________________________________"""
 
 
-commands = {
+""" commands = {
     "DEMOON" : b'\x5A\x08\x04\x84\x00\x00\x01',
     "DEMOOFF" : b'\x5A\x08\x04\x84\x00\x00\x00',
     "SAVE" : b'\x5A\x08\x04\x84\x00\x01\x01',
@@ -45,36 +82,36 @@ else:
     print("no")
 print(len(commands.get("BLINKOFF")))
 
- 
+  """
 """___________________________________________________________________________________________"""
 
 """___________________________________________________________________________________________"""
 
-def queseyo():
+""" def queseyo():
     lista=[]
     for i in range(10):
         lista.append(i)
     return lista[0:5], lista[5:10]
 parte1,parte2 = queseyo()
 print(parte1)
-print(parte2)
+print(parte2) """
 
 """___________________________________________________________________________________________"""
 
 """___________________________________________________________________________________________"""
 
-listaA=[0x50,0x51,0x52]
+""" listaA=[0x50,0x51,0x52]
 
 listaB=listaA
 listaB.append(0x00);listaB.append(0x01)
 
-print(listaB)
+print(listaB) """
 
 """___________________________________________________________________________________________"""
 
 """___________________________________________________________________________________________"""
 
-brightValue = 100
+""" brightValue = 100
 brightValue = int((brightValue*2000)/100.0)
 tobytes = brightValue.to_bytes(2, byteorder='big')
 BRIGHt = list(b'\x5A\x08\x05\x80\x00\x08')
@@ -84,13 +121,13 @@ BRIGHt.append(tobytes[1])
 
 if 90 in BRIGHt:
     print(BRIGHt)
-print(len(BRIGHt))
+print(len(BRIGHt)) """
 
 """___________________________________________________________________________________________"""
 
 """___________________________________________________________________________________________"""
 #a,b = generateBitmap('d:\VSCode\Folders\TrafficLights\GUI\BitmapGenerator\circulo.png')
-
+""" 
 a= [0,1]
 b= [(0,1),(2,3)]
 
@@ -99,7 +136,7 @@ if type(a[0]) == int:
 
 if type(b[0]) == tuple:
     print(b)
-
+ """
 """___________________________________________________________________________________________"""
 
 """___________________________________________________________________________________________"""
@@ -113,13 +150,13 @@ addressValueToBytes = hexadecimalI.to_bytes(2, byteorder='big')
 print(addressValueToBytes[1],addressValueToBytes[0])
 print(hexadecimalI,hexadecimalII,type(hexadecimalI))
 """
-print(type(None))
+""" print(type(None)) """
 
 """___________________________________________________________________________________________"""
 
 """___________________________________________________________________________________________"""
 
-bitmap = "BITMAP1"
+""" bitmap = "BITMAP1"
 x = (int(bitmap[-1:])+2)
 
 print(x)
@@ -131,75 +168,12 @@ if btmaddr in bitmapAddress:
     print("it is    !!")
 else:
     print("it's not  :c!")
-
+ """
 """___________________________________________________________________________________________"""
 
 """___________________________________________________________________________________________"""
 
-# import serial.tools.list_ports_linux
-# import functools
 
-
-
-# def selectDevice(index):
-#         portID= ports[index].product
-#         print(str(portID) + "selected")
-#         Label(root,text=(str(portID) + " selected")).pack()
-
-#         for a in range(len(ports)):
-#             portsList[a].pack_forget()
-
-# def onObjectClick(e):
-#     print("right clicjed!")
-#     try:
-#         m.tk_popup(e.x_root, e.y_root)
-#     finally:
-#         m.grab_release()
-
-
-# portsList = []
-# num = 0
-# ports = serial.tools.list_ports_linux.comports()
-
-
-# root = Tk()
-# root.title("Gui Tests")
-# root.config(bg="black")
-# root.geometry("700x700") 
-# #root.attributes("-fullscreen", True) #Abre la ventana en pantalla completa
-# #root.resizable(True,False)
-
-# m = Menu(root, tearoff = 0)
-# m.add_command(label ="Cut")
-# m.add_command(label ="Copy")
-# m.add_command(label ="Paste")
-# m.add_command(label ="Reload")
-# m.add_separator()
-# m.add_command(label ="Rename")
-  
-    
-
-# for p in ports:
-#                 ## Button objects, Displays serial ports as buttons
-#     portsList.append(Button(root, font= ("Tahoma",14), text=(p.product), width=30,command= functools.partial(selectDevice, index = ports.index(p))))
-#     portsList[num].pack()
-#     num += 1
-
-
-
-# canvas = Canvas(root, width=400, height=500, bg="white")
-# canvas.pack(side=LEFT,padx = 5, pady = 5)
-# step1=canvas.create_rectangle(50,50,150,150,fill="lightblue",activefill="dark slate gray")
-# canvas.create_line(100,150,100,200,arrow=LAST,width = 3, fill="red")
-# canvas.create_rectangle(50,200,150,300,fill="lightblue")
-# canvas.create_line(100,300,100,400,200,400,200,400,200,100,150,100,arrow=LAST,width = 3, fill="red")
-# canvas.create_line(100,0,100,500,dash=(3,5))
-
-# canvas.create_text(200,90,fill="darkblue",font="Roboto 12 italic bold",text="Step 1", activefill="dark slate gray")
-
-# canvas.tag_bind(step1, '<ButtonPress-3>', onObjectClick)  
-
-# root. mainloop()
 
 """___________________________________________________________________________________________"""
 
@@ -282,7 +256,7 @@ else:
 
 
 
-from tkinter import * 
+""" from tkinter import * 
 root = Tk()
 canvas = Canvas(root, width=400, height=200)
 canvas.pack()
@@ -317,4 +291,10 @@ mm = MouseMover()
 canvas.bind("<Button-1>", mm.select)
 canvas.bind("<B1-Motion>", mm.drag)
 
-root.mainloop()
+root.mainloop() """
+
+
+""" imagesPath = os.getcwd()
+imagesPath = imagesPath.replace("/modules","/images")
+
+print(imagesPath) """

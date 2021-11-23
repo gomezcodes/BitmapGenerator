@@ -1,6 +1,6 @@
 import serial
 import time
-from convertidordeimagen import generateBitmap
+from bitmapGenerator import generateBitmap
 from termcolor import colored,cprint
 import os
 import platform
@@ -117,21 +117,21 @@ def switchMenuCommand(receivedCommand):
 
 def processUARTCommand(command):
 
-	try:
-		if command == "LOAD":
-			commandSent = processLoadCommand(int(commandSelected[ATTRIBUTE1],16))
-		elif command == "COLOR":
-			commandSent = processChangeColorCommand(commandSelected[ATTRIBUTE1],commandSelected[ATTRIBUTE2])
-		elif command == "BRIGHT":
-			commandSent = processBrightCommand(int(commandSelected[ATTRIBUTE1]))
-		elif command == "BLINKTIME":
-			commandSent = processBlinkCommand(int(commandSelected[ATTRIBUTE1]))
-		else:
-			device.write(uartCommands.get(command))
-			commandSent = uartCommands.get(command)
-	except:
-		cprint("Syntax error, for more info type 'help'","red",attrs=["bold"])
-		commandSent = None
+	#try:
+	if command == "LOAD":
+		commandSent = processLoadCommand(int(commandSelected[ATTRIBUTE1],16))
+	elif command == "COLOR":
+		commandSent = processChangeColorCommand(commandSelected[ATTRIBUTE1],commandSelected[ATTRIBUTE2])
+	elif command == "BRIGHT":
+		commandSent = processBrightCommand(int(commandSelected[ATTRIBUTE1]))
+	elif command == "BLINKTIME":
+		commandSent = processBlinkCommand(int(commandSelected[ATTRIBUTE1]))
+	else:
+		device.write(uartCommands.get(command))
+		commandSent = uartCommands.get(command)
+	#except:
+		#cprint("Syntax error, for more info type 'help'","red",attrs=["bold"])
+		#commandSent = None
 
 	if commandSent == "Success":
 		pass
@@ -207,6 +207,7 @@ def processLoadCommand(startAddress):
 
 def selectImage():
 	imagesPath = os.getcwd()
+	imagesPath = imagesPath.replace("modules","images") 
 	imagesOnPath = os.listdir(imagesPath)
 	imagenes = []
 
@@ -222,7 +223,7 @@ def selectImage():
 	selectedImage = int(input("Select image (index)\n>"))
 	imagePath = imagenes[selectedImage]
 
-	return imagePath
+	return imagesPath + "/" + imagePath
 
 def processChangeColorCommand(bitmap,Color):
 
