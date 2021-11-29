@@ -1,14 +1,7 @@
-""" from TLControlCenter import *
-GUI = AppTrafficLight()
-while True:
-	try:
-		GUI.root.update_idletasks() 
-		GUI.root.update()
-	except """
-
 from modules.classSerial import scanPorts
 from modules.classSerial import *
 from modules.classTkinter import *
+
 
 serialConnection = None
 runningProgram = True
@@ -17,23 +10,24 @@ def stopProgram():
     global runningProgram ; runningProgram = False
 
     if serialConnection:
-        interfazTL.close()
+        #interfazTL.close()
         exit()
 
     graphicUserInterface.destroyWindow()
 
-print(scanPorts())
+""" print(scanPorts())
 serialPort = input("Select Device if available:")
-serialBaudrate = input("Baudrate:")
+serialBaudrate = input("Baudrate:") """
 
 
-try:
+""" try:
     interfazTL = serialInterface(serialPort,serialBaudrate)
     serialConnection = True
 except:
-    pass
+    runningProgram = False """
 
 graphicUserInterface = GraphicUITrafficLight()
+
 graphicUserInterface.exitProtocol(stopProgram)
 
 while runningProgram:
@@ -41,9 +35,9 @@ while runningProgram:
 
     if serialConnection:
         
-        chooseBitmap = input("mandar")
+        """ chooseBitmap = input("mandar")
 
         if chooseBitmap in list(interfazTL.commands.keys()):
             interfazTL.write(interfazTL.commands.get(chooseBitmap))
             graphicUserInterface.root.title("Hola")
-            print("done")
+            print("done") """

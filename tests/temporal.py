@@ -298,3 +298,48 @@ root.mainloop() """
 imagesPath = imagesPath.replace("/modules","/images")
 
 print(imagesPath) """
+
+import time
+
+uartCommands = {
+	"BLINKOFF" 	: b'\x5A\x08\x05\x80\x00\x01\x00\x00',
+	"BLINKON" 	: b'\x5A\x08\x05\x80\x00\x01\x00\x01',
+	"BITMAP1" 	: b'\x5A\x08\x05\x80\x00\x00\x00\x00',
+	"BITMAP2" 	: b'\x5A\x08\x05\x80\x00\x00\x00\x01',
+	"BITMAP3" 	: b'\x5A\x08\x05\x80\x00\x00\x00\x02',
+	"BITMAP4" 	: b'\x5A\x08\x05\x80\x00\x00\x00\x03',
+}
+
+intermediariojiji = list(uartCommands.keys())
+
+print(intermediariojiji[1])
+
+#[Bitmap, Blink, TimeonStep]
+secuencues = [
+    ["BITMAP1", False, 2],
+    ["BITMAP1", True, 1],
+    ["BITMAP2", False, 3],
+    ["BITMAP3", False, 2],
+]
+
+print(secuencues[0][0]," ")
+
+
+""" def secuencer(bitmap,blinkState,timeOnStep):
+
+    timenow = time.time()
+    if blinkState:
+        print(uartCommands.get("BLINKON"))
+    else:
+        print(uartCommands.get("BLINKOFF"))
+
+    #time.sleep(0.01)
+
+    print(uartCommands.get(bitmap))
+    time.sleep(timeOnStep)
+
+    print(time.time()-timenow)
+
+
+for step in secuencues:
+    secuencer(step[0],step[1],step[2]) """

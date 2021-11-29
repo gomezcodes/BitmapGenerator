@@ -207,7 +207,12 @@ def processLoadCommand(startAddress):
 
 def selectImage():
 	imagesPath = os.getcwd()
-	imagesPath = imagesPath.replace("modules","images") 
+	
+	if SYSTEMOS == "Windows":
+		imagesPath = "D:\VSCode\Folders\TrafficLights\GUI\BitmapGenerator\images"
+	else:
+		imagesPath = imagesPath.replace("modules","images") 
+
 	imagesOnPath = os.listdir(imagesPath)
 	imagenes = []
 
