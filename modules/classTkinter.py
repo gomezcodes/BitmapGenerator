@@ -4,6 +4,8 @@ class GraphicUITrafficLight:
 
     def __init__(self):
 
+    
+
         self.root = Tk()
         self.root.config(background="#000000")
         self.root.title("Traffic Lights")
@@ -19,22 +21,22 @@ class GraphicUITrafficLight:
         self.LightTrafficId = StringVar()
         self.TxLightTrafficConfig =StringVar()
         self.versionNumber = StringVar(value="0.0.1")
+        self.dataFromNose= []
 
         self.WelcomeScreen = WelcomeScreen(self.root,self.gotoMainScreen,self.versionNumber)
         self.MainScreen = MainScreen(self.root,self.gotosetupLightTrafficScreen,
                                     self.gotoconfigScreen,
                                     self.gotophasesConfig,
                                     self.gotooperScreen,
-                                    self.SysDate.get())
+                                    self.SysDate)
         self.SettingsScreen = SettingsScreen(self.root,self.gotoMainScreen,self.save)
         self.TLSettingScreen = LTSettingsScreen(self.root,self.sendConfig,self.gotoMainScreen)
-        self.PhasesSettingScreen =  PhasesSettingScreen(self.root,self.savePhases,self.gotoMainScreen)
+        self.PhasesSettingScreen =  PhasesSettingScreen(self.root,self.savePhases,self.gotoMainScreen,self.loadPhases)
         self.OperationScreen = OperationScreen(self.root,self.gotoMainScreen)
 
 
     def gotoMainScreen(self):
         self.WelcomeScreen.hide()
-        #self.welcomeScreen.pack_forget()
         self.SettingsScreen.hide()
         self.TLSettingScreen.hide()
         self.PhasesSettingScreen.hide()
@@ -64,7 +66,10 @@ class GraphicUITrafficLight:
 	    print("Configuracion enviada a semaforo!")
 
     def savePhases(self):
-	    print("Fases guardadas")
+	    pass
+    
+    def loadPhases(self):
+        pass
 
     def refreshScreen(self):
         self.root.update_idletasks()

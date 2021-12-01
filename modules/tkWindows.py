@@ -24,7 +24,7 @@ class MainScreen():
     def __init__(self,root,command0,command1,command2,command3,SysDate) -> None:
         
         self.mainScreen = Frame(root, height = 400, width= 800, bg="lightblue")
-        Label(self.mainScreen,text=SysDate).pack()
+        Label(self.mainScreen,textvariable=SysDate).pack()
         Button(self.mainScreen,text="CONFIGURAR SEMAFOROS", command= command0).pack(padx=40,pady=20)
         Button(self.mainScreen,text="CONFIGURAR SISTEMA", command= command1).pack(padx=40,pady=20)
         Button(self.mainScreen,text="CONFIGURACION DE FASES", command= command2).pack(padx=40,pady=20)
@@ -83,11 +83,12 @@ class LTSettingsScreen():
 
 class PhasesSettingScreen():
 
-    def __init__(self,root,cmdSavePhases,cmdGotoMainScreen) -> None:
+    def __init__(self,root,cmdSavePhases,cmdGotoMainScreen,cmdLoadFile) -> None:
         
         self.phasesConfigScreen = Frame(root, height = 400, width= 800, bg="purple")
-        Button(self.phasesConfigScreen, text="GUARDAR CONFIGURACION DE FASES", command= cmdSavePhases)
+        Button(self.phasesConfigScreen, text="GUARDAR CONFIGURACION DE FASES", command= cmdSavePhases).pack(padx=40,pady=35)
         Button(self.phasesConfigScreen,text="<---", command= cmdGotoMainScreen).pack(padx=40,pady=35)
+        Button(self.phasesConfigScreen,text="Load",command=cmdLoadFile).pack(padx=40,pady=35)
 
     def show(self):
         self.phasesConfigScreen.pack()

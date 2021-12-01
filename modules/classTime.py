@@ -1,4 +1,5 @@
 import time as t
+from datetime import datetime,date
 
 def millis():
 
@@ -10,4 +11,11 @@ def nonBlockingDelay(currentTime, timeOut):
         return True
     else:
         return False
+
+def currentDate():
+    now = datetime.now()
+    dt_string = now.strftime("%B %d %Y %H:%M")
+
+    return dt_string
+
 

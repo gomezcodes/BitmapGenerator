@@ -2,21 +2,23 @@ from tkinter.filedialog import askopenfilename, asksaveasfile
 from io import open
 import json
 
-class FileChooser():
 
-    def openFile(self):
-        self.filePathOpen = askopenfilename(defaultextension="stps")
+
+def openFile():
+    filePathOpen = askopenfilename(defaultextension="stps")
         
-        if len(self.filePathOpen) != 0:
-            with open(self.filePathOpen) as file:
-                self.jsonDataDict = json.load(file)
-        
-        return self.filePathOpen,self.jsonDataDict
+    if len(filePathOpen) != 0:
+        with open(filePathOpen) as file:
+            jsonDataDict = json.load(file)
+            return filePathOpen,jsonDataDict
 
-    def saveFile(self,jsonData):
-        self.filePathSave = asksaveasfile(defaultextension="stps") 
-        self.filePathSave.close()
+    return None, None
 
-        with open(self.filePathSave.name, 'w') as file:
+def saveFile(jsonData):
+    filePathSave = asksaveasfile(defaultextension="stps") 
+
+    if filePathSave != None:
+        filePathSave.close()
+        with open(filePathSave.name, 'w') as file:
             json.dump(jsonData, file, indent=4)
 

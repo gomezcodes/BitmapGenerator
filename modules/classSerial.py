@@ -22,9 +22,13 @@ class serialInterface:
     }
 
     def __init__(self,serialPort,baudrate) -> None:
-        self.serialPort = serialPort
-        self.baudRate = baudrate
-        self.serialDevice = serial.Serial(self.serialPort,self.baudRate)
+        if serialPort != None and baudrate != None:
+            self.serialPort = serialPort
+            self.baudRate = baudrate
+            self.serialDevice = serial.Serial(self.serialPort,self.baudRate)
+        else:
+            self.serialDevice = serial.Serial()
+
 
     def write(self,dataToSend):
         try:

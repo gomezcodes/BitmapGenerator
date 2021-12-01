@@ -1,6 +1,7 @@
 from modules.classSerial import scanPorts
 from modules.classSerial import *
 from modules.classTkinter import *
+from modules.classTime import *
 
 
 serialConnection = None
@@ -10,34 +11,21 @@ def stopProgram():
     global runningProgram ; runningProgram = False
 
     if serialConnection:
-        #interfazTL.close()
+        uartInterface.close()
         exit()
 
     graphicUserInterface.destroyWindow()
 
-""" print(scanPorts())
-serialPort = input("Select Device if available:")
-serialBaudrate = input("Baudrate:") """
-
-
-""" try:
-    interfazTL = serialInterface(serialPort,serialBaudrate)
-    serialConnection = True
-except:
-    runningProgram = False """
+uartInterface = serialInterface(None,None)
 
 graphicUserInterface = GraphicUITrafficLight()
-
 graphicUserInterface.exitProtocol(stopProgram)
 
 while runningProgram:
+    t.sleep(0.001)
     graphicUserInterface.refreshScreen()
+    graphicUserInterface.SysDate.set(currentDate())
 
     if serialConnection:
-        
-        """ chooseBitmap = input("mandar")
+        print("Serial connection stablished")
 
-        if chooseBitmap in list(interfazTL.commands.keys()):
-            interfazTL.write(interfazTL.commands.get(chooseBitmap))
-            graphicUserInterface.root.title("Hola")
-            print("done") """

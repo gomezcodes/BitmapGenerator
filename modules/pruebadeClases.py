@@ -1,5 +1,5 @@
 from tkinter import *
-from classFileChooser import FileChooser
+from classFileChooser import *
 
 jdata = {}
 
@@ -27,11 +27,11 @@ def button_hover_leave(event):
 	status_label.config(text="")
 
 def save():
-    FileChooser.saveFile(jdata)
-    pass
+    saveFile(jdata)
+
 
 def load():
-    path,data = FileChooser.openFile()
+    path,data = openFile()
 
     print(path,data)    
 
