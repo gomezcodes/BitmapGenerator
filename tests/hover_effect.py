@@ -24,7 +24,7 @@ def bttn(x,y,text,bcolor,fcolor):
 					  border=0,
 					  borderwidth=0,
 					  overrelief="flat",
-					  highlightthickness=0,
+					  #highlightthickness=0,
 					  activeforeground=fcolor,
 					  activebackground=bcolor,
 					  )

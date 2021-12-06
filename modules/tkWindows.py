@@ -84,24 +84,91 @@ class LTSettingsScreen():
 class PhasesSettingScreen():
 
     def __init__(self,root,cmdSavePhases,cmdGotoMainScreen,cmdLoadFile) -> None:
+        self.graphicSteps = [] 
+        self.secuences = {}
+
+        self.graphicPhasesFrame = Frame(root, bg="purple")
+        self.logicPhasesFrame = Frame(root, bg="lightblue")
+
+        self.canvasFrame = Frame(self.graphicPhasesFrame)
+        self.canvasFrame.pack(expand=1)
         
-        self.phasesConfigScreen = Frame(root, height = 400, width= 800, bg="purple")
-        Button(self.phasesConfigScreen, text="GUARDAR CONFIGURACION DE FASES", command= cmdSavePhases).pack(padx=40,pady=35)
-        Button(self.phasesConfigScreen,text="<---", command= cmdGotoMainScreen).pack(padx=40,pady=35)
-        Button(self.phasesConfigScreen,text="Load",command=cmdLoadFile).pack(padx=40,pady=35)
+        self.canvas = Canvas(self.canvasFrame, width=400, height=700, bg="#007acc")
+        self.canvas.pack(padx = 0, pady = 0,expand=1,side=LEFT)
+        self.vbar=Scrollbar(self.canvasFrame,orient=VERTICAL)
+        self.vbar.config(command=self.canvas.yview)
+        self.canvas.config(yscrollcommand=self.vbar.set)
+        self.canvas.bind("<Button-4>", self.on_mousewheel)
+        self.canvas.bind("<Button-5>", self.on_mousewheel)
+
+        self.trafficIdSel= ttk.Combobox(self.logicPhasesFrame)
+        self.trafficIdSel["values"] = ["Semaforo 1","Semaforo 2","Semaforo 3","Semaforo 4","Semaforo 5"]
+
+        Label(self.logicPhasesFrame,text="This is a ComboBox",font="Helvetica 15").pack()
+        self.trafficIdSel.pack(side=TOP,fill=BOTH,padx=10,pady=10,expand=0)
+
+        Label(self.logicPhasesFrame,text="This is a CheckButton",font="Helvetica 15").pack()
+        Checkbutton(self.logicPhasesFrame,text="HOLA",width=20,height=1).pack(side=TOP,fill=BOTH,padx=10,pady=10,expand=1)
+
+        Label(self.logicPhasesFrame,text="These are Buttons",font="Helvetica 15").pack()
+
+        Button(self.logicPhasesFrame, text="SAVE FILE", command= cmdSavePhases,width=20,height=5).pack(side=BOTTOM,fill=BOTH,padx=10,pady=10,expand=1)
+        Button(self.logicPhasesFrame,text="<- RETURN", command= cmdGotoMainScreen,width=20,height=5).pack(side=BOTTOM,fill=BOTH,padx=10,pady=10,expand=1)
+        Button(self.logicPhasesFrame,text="OPEN FILE",command=cmdLoadFile,width=20,height=5).pack(side=BOTTOM,fill=BOTH,padx=10,pady=10,expand=1)
+        self.loadPhasesFileButton = Button(self.logicPhasesFrame,text="CARGAR FASES",state="disabled",command=self.generateGraphics,width=20,height=5)
+        self.loadPhasesFileButton.pack(side=BOTTOM,fill=BOTH,padx=10,pady=10,expand=1)
+        
+    def generateGraphics(self):
+        yAxisStart = 50
+        yAxisEnd = 150
+        yAxisText = 90
+
+        for stepID in self.secuences["steps"]:
+            step = self.canvas.create_rectangle(50,yAxisStart,150,yAxisEnd,fill="lightblue",
+                                            activefill="dark slate gray")
+            self.canvas.create_text(250,yAxisText,fill="darkblue",font="Roboto 12 italic bold",text=stepID["stepName"], activefill="dark slate gray")
+            self.graphicSteps.append(step)
+            yAxisStart += 150
+            yAxisEnd += 150
+            yAxisText  += 150
+        
+        yAxisStart = 150
+        yAxisEnd = 200
+        
+        for _ in self.secuences["steps"]:
+            step = self.canvas.create_line(100,yAxisStart,100,yAxisEnd,arrow=LAST,width = 3, fill="red")
+            yAxisStart += 150
+            yAxisEnd += 150
+
+        returnLine = len(self.graphicSteps)*150
+        self.canvas.create_line(100,returnLine,100,returnLine+50,200,returnLine+50,200,100,150,100,arrow=LAST,width = 3, fill="red")
+        
+        self.canvas.config(scrollregion=(0,0,1000,1000))
+        """ hbar.pack(side=BOTTOM,fill=X) """
+        self.vbar.pack(side=RIGHT,fill=Y)
+    
+    def on_mousewheel(self,event):
+        if event.num == 4:
+            self.canvas.yview_scroll(int(-1*(event.num/4)),"units")
+
+        if event.num == 5:
+            self.canvas.yview_scroll(int(event.num/5),"units")
 
     def show(self):
-        self.phasesConfigScreen.pack()
+        self.graphicPhasesFrame.pack(side=LEFT,fill=BOTH,expand=1)
+        self.logicPhasesFrame.pack(side=LEFT,fill=BOTH,expand=1)
 
     def hide(self):
-        self.phasesConfigScreen.pack_forget()
+        self.graphicPhasesFrame.pack_forget()
+        self.logicPhasesFrame.pack_forget()
 
 class OperationScreen():
 
-    def __init__(self,root,cmdGotoMainScreen) -> None:
+    def __init__(self,root,cmdGotoMainScreen,cmdStartSecuence) -> None:
         
         self.operScreen = Frame(root, height = 400, width= 800, bg="lightgreen")
         Button(self.operScreen,text="PAGINA PRINCIPAL", command= cmdGotoMainScreen).pack(padx=40,pady=35)
+        Button(self.operScreen,text="begin secuence",command=cmdStartSecuence).pack(padx=40,pady=40)
 
     def show(self):
         self.operScreen.pack()

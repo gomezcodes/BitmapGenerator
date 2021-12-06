@@ -3,19 +3,26 @@ from classFileChooser import *
 
 jdata = {}
 
-jdata['clients'] = []
+jdata['steps'] = []
 
-jdata['clients'].append({
-    'first_name': 'Sigrid',
-    'last_name': 'Mannock',
-    'age': 27,
-    'amount': 7.17})
+print(jdata.keys())
 
-jdata['clients'].append({
-    'first_name': 'Joaquin',
-    'last_name': 'Hinners',
-    'age': 21,
-    'amount': [1.90, 5.50]})
+jdata['steps'].append(
+{
+    'stepName'  : 'Step1',
+    'bitmap'    : 1,
+    'timeOnStep': 5,
+    'blink'     : False
+})
+
+jdata['steps'].append(
+{
+    'stepName'  : 'Step2',
+    'bitmap'    : 2,
+    'timeOnStep': 10,
+    'blink'     : True
+})
+
 
 def button_hover(event):
 	my_button["activeback"]="Azure"
@@ -32,8 +39,9 @@ def save():
 
 def load():
     path,data = openFile()
-
-    print(path,data)    
+    for i in data["steps"]:
+        print(i)
+ 
 
 
 root = Tk()

@@ -12,7 +12,7 @@ def stopProgram():
 
     if serialConnection:
         uartInterface.close()
-        exit()
+        exit() #Remove when finished
 
     graphicUserInterface.destroyWindow()
 
@@ -21,11 +21,11 @@ uartInterface = serialInterface(None,None)
 graphicUserInterface = GraphicUITrafficLight()
 graphicUserInterface.exitProtocol(stopProgram)
 
+
 while runningProgram:
     t.sleep(0.001)
-    graphicUserInterface.refreshScreen()
-    graphicUserInterface.SysDate.set(currentDate())
+    graphicUserInterface.refreshScreen(currentDate())
 
     if serialConnection:
-        print("Serial connection stablished")
+        pass
 

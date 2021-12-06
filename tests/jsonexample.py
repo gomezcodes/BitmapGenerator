@@ -22,8 +22,8 @@ data['clients'].append({
     'age': 36,
     'amount': 1.11})
 
-""" with open('data.json', 'w') as file:
-    json.dump(data, file, indent=4) """
+with open('data.json', 'w') as file:
+    json.dump(data, file, indent=4)
 
 
 

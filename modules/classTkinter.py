@@ -1,27 +1,32 @@
 from modules.tkWindows import *
+import modules.classFileChooser as classFileChooser
+
 
 class GraphicUITrafficLight:
 
-    def __init__(self):
-
     
 
+    def __init__(self):
+
+        self.stpsFileData = {}
+        self.stpsFilePath = ""
+        self.secuenceState = False
         self.root = Tk()
         self.root.config(background="#000000")
         self.root.title("Traffic Lights")
-        self.root.geometry("800x400")
+        self.root.geometry("1300x800")
+        self.root.minsize(867,730)
 
         self.SysDate = StringVar(value="10 Agosto 2021 11:11 hrs")
-        self.SupervisorKey = StringVar()
-        self.ServiceKey = StringVar()
-        self.SysKey	= StringVar()
-        self.LightTrafficNumber = IntVar(value=0)
-        self.LightModeHour = StringVar()
-        self.NightBrightLevel = IntVar()
-        self.LightTrafficId = StringVar()
-        self.TxLightTrafficConfig =StringVar()
         self.versionNumber = StringVar(value="0.0.1")
-        self.dataFromNose= []
+        self.graphicSteps= []
+        self.secuencues = {
+            "STEP 1" : ["BITMAP1", False, 10],
+            "STEP 2" : ["BITMAP1", True, 8],
+            "STEP 3" : ["BITMAP1", True, 8],
+            "STEP 4" : ["BITMAP1", True, 8],
+            "STEP 5" : ["BITMAP1", True, 8],
+        }
 
         self.WelcomeScreen = WelcomeScreen(self.root,self.gotoMainScreen,self.versionNumber)
         self.MainScreen = MainScreen(self.root,self.gotosetupLightTrafficScreen,
@@ -31,8 +36,10 @@ class GraphicUITrafficLight:
                                     self.SysDate)
         self.SettingsScreen = SettingsScreen(self.root,self.gotoMainScreen,self.save)
         self.TLSettingScreen = LTSettingsScreen(self.root,self.sendConfig,self.gotoMainScreen)
-        self.PhasesSettingScreen =  PhasesSettingScreen(self.root,self.savePhases,self.gotoMainScreen,self.loadPhases)
-        self.OperationScreen = OperationScreen(self.root,self.gotoMainScreen)
+        self.PhasesSettingScreen =  PhasesSettingScreen(self.root,self.savePhases,
+                                                        self.gotoMainScreen,
+                                                        self.loadPhases)
+        self.OperationScreen = OperationScreen(self.root,self.gotoMainScreen,self.startSecuence)
 
 
     def gotoMainScreen(self):
@@ -66,14 +73,22 @@ class GraphicUITrafficLight:
 	    print("Configuracion enviada a semaforo!")
 
     def savePhases(self):
-	    pass
+        classFileChooser.saveFile({})
     
     def loadPhases(self):
-        pass
+        self.stpsFilePath,self.stpsFileData = classFileChooser.openFile()
+        self.PhasesSettingScreen.secuences = self.stpsFileData
 
-    def refreshScreen(self):
+        if self.stpsFileData != None and self.stpsFilePath != None:
+            self.PhasesSettingScreen.loadPhasesFileButton["state"] = "active"
+    
+    def startSecuence(self):
+        self.secuenceState = True
+
+    def refreshScreen(self,sysDate):
         self.root.update_idletasks()
         self.root.update()
+        self.SysDate.set(sysDate)
 
     def destroyWindow(self):
         self.root.quit()
@@ -87,3 +102,13 @@ class GraphicUITrafficLight:
 if __name__ == "__main__":
     exampleGUI = GraphicUITrafficLight()
     exampleGUI.root.mainloop()
+
+
+""" self.SupervisorKey = StringVar()
+self.ServiceKey = StringVar()
+self.SysKey	= StringVar()
+self.LightTrafficNumber = IntVar(value=0)
+self.LightModeHour = StringVar()
+self.NightBrightLevel = IntVar()
+self.LightTrafficId = StringVar()
+self.TxLightTrafficConfig =StringVar() """

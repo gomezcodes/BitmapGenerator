@@ -1,8 +1,23 @@
 from tkinter import *
 
+""" WINDOWS
+
 def on_mousewheel(event):
     canvas.yview_scroll(int(-1*(event.delta/120)), "units") #event.num  para linux
-    print(event.delta)
+    print(event.delta) """
+
+def mouse_wheel(event):
+    if event.num == 4:
+        canvas.yview_scroll(int(-1*(event.num/4)),"units")
+
+    if event.num == 5:
+        canvas.yview_scroll(int(event.num/5),"units")
+
+
+
+
+
+        
 
 secuencues = {
     "STEP 1" : ["BITMAP1", False, 10],
@@ -63,10 +78,13 @@ hbar.config(command=canvas.xview) """
 
 vbar=Scrollbar(frame,orient=VERTICAL)
 vbar.config(command=canvas.yview)
-
 canvas.config(yscrollcommand=vbar.set)
 
-canvas.bind("<MouseWheel>", on_mousewheel)
+""" WINDOWS 
+canvas.bind("<MouseWheel>", on_mousewheel) """
+canvas.bind("<Button-4>", mouse_wheel)
+canvas.bind("<Button-5>", mouse_wheel)
+
 
 Button(root,text="LOAD",command=generateGraphics).pack(side=RIGHT)
 

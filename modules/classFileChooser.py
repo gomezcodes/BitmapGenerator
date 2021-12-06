@@ -4,7 +4,7 @@ import json
 
 
 
-def openFile():
+def openFile() -> dict:
     filePathOpen = askopenfilename(defaultextension="stps")
         
     if len(filePathOpen) != 0:

@@ -2,7 +2,7 @@ import time
 from tkinter import *
 import serial
 import threading
-from BitmapGenerator.modules.classTime import *
+from modules.classTime import *
 
 try:
     serialDevice = serial.Serial("COM10",19200)

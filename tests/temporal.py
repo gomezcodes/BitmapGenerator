@@ -179,41 +179,29 @@ else:
 
 """___________________________________________________________________________________________"""
 
-# from tkinter import *
-# from tkinter import font
-
-# root = Tk()
-# root.geometry("500x500")
-
-# def font_chooser(e):
-#     our_font.config(
-#         family=my_listbox.get(my_listbox.curselection()))
-#     print(my_listbox.get(my_listbox.curselection()))
-
-# our_font = font.Font(family="helvetica",size=32)
-
-# myframe = Frame(root,width=480,height=275)
-# myframe.pack()
-
-# myframe.grid_propagate(False)
-# myframe.columnconfigure(0,weight=10)
-
-
-# mytext= Text(myframe,font=our_font)
-# mytext.grid(row=0,column=0)
-# mytext.grid_rowconfigure(0,weight=1)
-# mytext.grid_columnconfigure(0,weight = 1)
-
-# my_listbox = Listbox(root,selectmode=SINGLE, width = 80)
-# my_listbox.pack()
-
-# for f in font.families():
-#     my_listbox.insert("end",f)
-
-# my_listbox.bind("<ButtonRelease-1>",font_chooser)
-
-# root.mainloop()
-
+from tkinter import *
+from tkinter import font
+root = Tk()
+root.geometry("500x500")
+def font_chooser(e):
+    our_font.config(
+        family=my_listbox.get(my_listbox.curselection()))
+    print(my_listbox.get(my_listbox.curselection()))
+our_font = font.Font(family="helvetica",size=32)
+myframe = Frame(root,width=480,height=275)
+myframe.pack()
+myframe.grid_propagate(False)
+myframe.columnconfigure(0,weight=10)
+mytext= Text(myframe,font=our_font)
+mytext.grid(row=0,column=0)
+mytext.grid_rowconfigure(0,weight=1)
+mytext.grid_columnconfigure(0,weight = 1)
+my_listbox = Listbox(root,selectmode=SINGLE, width = 80)
+my_listbox.pack()
+for f in font.families():
+    my_listbox.insert("end",f)
+my_listbox.bind("<ButtonRelease-1>",font_chooser)
+root.mainloop()
 """___________________________________________________________________________________________"""
 
 """___________________________________________________________________________________________"""
@@ -343,3 +331,8 @@ print(secuencues[0][0]," ")
 
 for step in secuencues:
     secuencer(step[0],step[1],step[2]) """
+
+
+asciichar = [ chr(x) for x in range(10,100)]
+
+print(asciichar)
