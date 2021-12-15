@@ -1,5 +1,8 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter.ttk import Combobox
+from tkinter.messagebox import showerror
+
 
 class WelcomeScreen():
 
@@ -83,7 +86,129 @@ class LTSettingsScreen():
 
 class PhasesSettingScreen():
 
-    def __init__(self,root,cmdSavePhases,cmdGotoMainScreen,cmdLoadFile) -> None:
+    def __init__(self,root) -> None:
+
+        self.rectangleTarget = "STEP"
+        self.lineTarget= "LINE"
+        self.targetNum = 0
+        self.yAxisStart = 50
+        self.yAxisEnd = 150
+        self.stepsList = []
+        self.stepnameVar = StringVar()
+        self.bitmapVar = StringVar()
+        self.timeStepVar = DoubleVar()
+        self.blinkstateVar = BooleanVar()
+
+        self.graphicPhasesFrame = Frame(root, bg="purple")
+        self.logicPhasesFrame = Frame(root, bg="lightblue")
+
+        self.canvasFrame = Frame(self.graphicPhasesFrame)
+        self.canvasFrame.pack(expand=1)
+
+        self.canvas = Canvas(self.canvasFrame, width=400, height=700, bg="#007acc")
+        self.canvas.pack(padx = 0, pady = 0,expand=1,side=LEFT)
+        self.vbar=Scrollbar(self.canvasFrame,orient=VERTICAL)
+        self.vbar.config(command=self.canvas.yview)
+        self.canvas.config(yscrollcommand=self.vbar.set)
+        self.canvas.bind("<Button-4>", self.on_mousewheel)
+        self.canvas.bind("<Button-5>", self.on_mousewheel)
+
+        Label(self.logicPhasesFrame,text="Step List",font="Forte 15").pack()
+        self.stepname = Combobox(self.logicPhasesFrame,textvariable=self.stepnameVar)
+        self.stepname["values"] = self.stepsList
+        self.stepname.pack()
+
+        Label(self.logicPhasesFrame,text="Bitmap List",font="Forte 15").pack()
+        self.bitmap = Combobox(self.logicPhasesFrame,textvariable=self.bitmapVar)
+        self.bitmap["values"] = ["Bitmap 1","Bitmap 2","Bitmap 3","Bitmap 4"]
+        self.bitmap.pack()
+
+        Label(self.logicPhasesFrame,text="Time on Step (seconds)",font="Forte 15").pack()
+        self.timeStep = Entry(self.logicPhasesFrame,textvariable=self.timeStepVar)
+        self.timeStep.pack()
+
+        Label(self.logicPhasesFrame,text="Blink (Y/N)",font="Forte 15").pack()
+        self.blinkState = Checkbutton(self.logicPhasesFrame,variable=self.blinkstateVar,text="Blink")
+        self.blinkState.pack()
+
+        Button(self.logicPhasesFrame,text="Save",command=self.saveSecuence).pack()
+        Button(self.logicPhasesFrame,text="ADD",command=self.addStep).pack()
+        Button(self.logicPhasesFrame,text="Generate",command=lambda : print("Generate")).pack()
+        Button(self.logicPhasesFrame,text="Delete",command=self.deleteStep).pack()
+    
+    def addStep(self):
+        self.targetNum += 1
+        self.rectangleTarget += str(self.targetNum)
+        self.lineTarget += str(self.targetNum)
+        self.canvas.create_rectangle(50,self.yAxisStart,150,self.yAxisEnd,fill="lightblue",activefill="dark slate gray",tags=self.rectangleTarget)
+        
+        returnLine = self.targetNum*150
+
+        if self.targetNum != 1:
+            self.canvas.create_line(100,self.yAxisStart-50,100,self.yAxisEnd-100,arrow=LAST,width = 3, fill="red",tags=self.lineTarget)
+            self.canvas.delete("RETURNLINE")
+            self.canvas.create_line(100,returnLine,100,returnLine+50,200,returnLine+50,200,100,150,100,arrow=LAST,width = 3, fill="red",tags="RETURNLINE")
+        else:
+            self.canvas.create_line(100,returnLine,100,returnLine+50,200,returnLine+50,200,100,150,100,arrow=LAST,width = 3, fill="red",tags="RETURNLINE")
+
+        print(self.canvas.coords(self.rectangleTarget))
+        
+        self.stepsList.append(self.rectangleTarget)
+        self.stepname["values"] = self.stepsList
+        self.stepname.set(self.rectangleTarget)
+        print(self.targetNum)
+
+        self.lineTarget = "LINE"
+        self.rectangleTarget = "STEP"
+        
+        self.yAxisStart += 150
+        self.yAxisEnd += 150
+
+    def deleteStep(self):    
+        if self.targetNum > 0:
+            returnLine  = (self.targetNum-1)*150
+            print(self.targetNum)
+            targetDelete = self.rectangleTarget + str(self.targetNum)
+            line = self.lineTarget + str(self.targetNum)
+            self.stepsList.remove(targetDelete)
+
+            self.stepname["values"] = self.stepsList
+
+            self.targetNum -= 1
+            print(f"Eliminated {targetDelete}")
+            self.canvas.delete(targetDelete)
+            self.canvas.delete(line)
+            self.canvas.delete("RETURNLINE")
+            print(self.canvas.find_all())
+            if len(self.canvas.find_all()) != 0:
+                self.canvas.create_line(100,returnLine,100,returnLine+50,200,returnLine+50,200,100,150,100,arrow=LAST,width = 3, fill="red",tags="RETURNLINE")
+            self.yAxisStart -= 150
+            self.yAxisEnd -= 150
+
+    def saveSecuence(self):
+        print(f"{self.stepnameVar.get()} {self.bitmapVar.get()} {self.timeStepVar.get()} {self.blinkstateVar.get()}")
+        
+        if self.stepnameVar.get() == "":
+            showerror("ERROR","Fill Blank Spaces")
+
+    def on_mousewheel(self,event):
+        if event.num == 4:
+            self.canvas.yview_scroll(int(-1*(event.num/4)),"units")
+
+        if event.num == 5:
+            self.canvas.yview_scroll(int(event.num/5),"units") 
+
+    def show(self):
+        self.graphicPhasesFrame.pack(side=LEFT,fill=BOTH,expand=1)
+        self.logicPhasesFrame.pack(side=LEFT,fill=BOTH,expand=1)
+
+    def hide(self):
+        self.graphicPhasesFrame.pack_forget()
+        self.logicPhasesFrame.pack_forget()
+
+class OperationScreen():
+
+    def __init__(self,root,cmdGotoMainScreen,cmdLoadFile,cmdStartSecuence) -> None:
         self.graphicSteps = [] 
         self.secuences = {}
 
@@ -112,7 +237,8 @@ class PhasesSettingScreen():
 
         Label(self.logicPhasesFrame,text="These are Buttons",font="Helvetica 15").pack()
 
-        Button(self.logicPhasesFrame, text="SAVE FILE", command= cmdSavePhases,width=20,height=5).pack(side=BOTTOM,fill=BOTH,padx=10,pady=10,expand=1)
+        #Button(self.logicPhasesFrame, text="SAVE FILE", command= cmdSavePhases,width=20,height=5).pack(side=BOTTOM,fill=BOTH,padx=10,pady=10,expand=1)
+        Button(self.logicPhasesFrame,text="begin secuence",command=cmdStartSecuence,width=20,height=5).pack(side=BOTTOM,fill=BOTH,padx=10,pady=10,expand=1)
         Button(self.logicPhasesFrame,text="<- RETURN", command= cmdGotoMainScreen,width=20,height=5).pack(side=BOTTOM,fill=BOTH,padx=10,pady=10,expand=1)
         Button(self.logicPhasesFrame,text="OPEN FILE",command=cmdLoadFile,width=20,height=5).pack(side=BOTTOM,fill=BOTH,padx=10,pady=10,expand=1)
         self.loadPhasesFileButton = Button(self.logicPhasesFrame,text="CARGAR FASES",state="disabled",command=self.generateGraphics,width=20,height=5)
@@ -162,16 +288,4 @@ class PhasesSettingScreen():
         self.graphicPhasesFrame.pack_forget()
         self.logicPhasesFrame.pack_forget()
 
-class OperationScreen():
-
-    def __init__(self,root,cmdGotoMainScreen,cmdStartSecuence) -> None:
-        
-        self.operScreen = Frame(root, height = 400, width= 800, bg="lightgreen")
-        Button(self.operScreen,text="PAGINA PRINCIPAL", command= cmdGotoMainScreen).pack(padx=40,pady=35)
-        Button(self.operScreen,text="begin secuence",command=cmdStartSecuence).pack(padx=40,pady=40)
-
-    def show(self):
-        self.operScreen.pack()
-
-    def hide(self):
-        self.operScreen.pack_forget()
+    

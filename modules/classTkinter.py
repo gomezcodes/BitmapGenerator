@@ -4,8 +4,6 @@ import modules.classFileChooser as classFileChooser
 
 class GraphicUITrafficLight:
 
-    
-
     def __init__(self):
 
         self.stpsFileData = {}
@@ -20,13 +18,6 @@ class GraphicUITrafficLight:
         self.SysDate = StringVar(value="10 Agosto 2021 11:11 hrs")
         self.versionNumber = StringVar(value="0.0.1")
         self.graphicSteps= []
-        self.secuencues = {
-            "STEP 1" : ["BITMAP1", False, 10],
-            "STEP 2" : ["BITMAP1", True, 8],
-            "STEP 3" : ["BITMAP1", True, 8],
-            "STEP 4" : ["BITMAP1", True, 8],
-            "STEP 5" : ["BITMAP1", True, 8],
-        }
 
         self.WelcomeScreen = WelcomeScreen(self.root,self.gotoMainScreen,self.versionNumber)
         self.MainScreen = MainScreen(self.root,self.gotosetupLightTrafficScreen,
@@ -36,10 +27,8 @@ class GraphicUITrafficLight:
                                     self.SysDate)
         self.SettingsScreen = SettingsScreen(self.root,self.gotoMainScreen,self.save)
         self.TLSettingScreen = LTSettingsScreen(self.root,self.sendConfig,self.gotoMainScreen)
-        self.PhasesSettingScreen =  PhasesSettingScreen(self.root,self.savePhases,
-                                                        self.gotoMainScreen,
-                                                        self.loadPhases)
-        self.OperationScreen = OperationScreen(self.root,self.gotoMainScreen,self.startSecuence)
+        self.PhasesSettingScreen =  PhasesSettingScreen(self.root)
+        self.OperationScreen = OperationScreen(self.root,self.gotoMainScreen,self.loadPhases,self.startSecuence)
 
 
     def gotoMainScreen(self):
@@ -51,36 +40,36 @@ class GraphicUITrafficLight:
         self.MainScreen.show()
 
     def gotosetupLightTrafficScreen(self):
-	    self.MainScreen.hide()
-	    self.TLSettingScreen.show()
+        self.MainScreen.hide()      
+        self.TLSettingScreen.show()
 
     def gotoconfigScreen(self):
-	    self.MainScreen.hide()
-	    self.SettingsScreen.show()
+        self.MainScreen.hide()
+        self.SettingsScreen.show() 
 
     def gotophasesConfig(self):
-	    self.MainScreen.hide()
-	    self.PhasesSettingScreen.show()
+        self.MainScreen.hide()
+        self.PhasesSettingScreen.show()
 
     def gotooperScreen(self):
-	    self.MainScreen.hide()
-	    self.OperationScreen.show()
+        self.MainScreen.hide()
+        self.OperationScreen.show()
 
     def save(self):
-	    print("Guardado!")
+        print("Guardado!")
     
     def sendConfig(self):
-	    print("Configuracion enviada a semaforo!")
+        print("Configuracion enviada a semaforo!")
 
     def savePhases(self):
         classFileChooser.saveFile({})
     
     def loadPhases(self):
         self.stpsFilePath,self.stpsFileData = classFileChooser.openFile()
-        self.PhasesSettingScreen.secuences = self.stpsFileData
+        self.OperationScreen.secuences = self.stpsFileData
 
         if self.stpsFileData != None and self.stpsFilePath != None:
-            self.PhasesSettingScreen.loadPhasesFileButton["state"] = "active"
+            self.OperationScreen.loadPhasesFileButton["state"] = "active"
     
     def startSecuence(self):
         self.secuenceState = True

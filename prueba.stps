@@ -1,0 +1,16 @@
+{
+    "steps": [
+        {
+            "stepName": "Step1",
+            "bitmap": 1,
+            "timeOnStep": 5,
+            "blink": false
+        },
+        {
+            "stepName": "Step2",
+            "bitmap": 2,
+            "timeOnStep": 10,
+            "blink": true
+        }
+    ]
+}

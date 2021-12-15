@@ -1,4 +1,4 @@
-import serial.tools.list_ports_linux
+from multiplatformFunctions import *
 import functools
 from tkinter import *
 
@@ -11,7 +11,8 @@ def selectDevice(index):
 
 portsList = []
 num = 0
-ports = serial.tools.list_ports_linux.comports()
+ports = serial_list_ports()
+
 
 root = Tk()
 root.title("Gui Tests")
@@ -22,8 +23,11 @@ root.geometry("700x700")
 
 for p in ports:
                 ## Button objects, Displays serial ports as buttons
-    portsList.append(Button(root, font= ("Tahoma",14), text=(p.product), width=30,command= functools.partial(selectDevice, index = ports.index(p))))
+    portsList.append(Button(root, font= ("Tahoma",14), text=(p.description), width=30,command= functools.partial(selectDevice, index = ports.index(p))))
     portsList[num].pack()
     num += 1
+    print(p.product)
+    print(p.description)
+    print(p.device)
 
 root. mainloop()
